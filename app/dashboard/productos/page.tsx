@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Filter, Edit, Trash2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 // Datos de ejemplo
 const mockProducts = [
@@ -10,6 +11,46 @@ const mockProducts = [
   { id: 2, name: "Mouse Logitech", quantity: 50, price: 80000, category: "Accesorios", provider: "Logitech" },
   { id: 3, name: "Teclado Redragon", quantity: 30, price: 150000, category: "Accesorios", provider: "Redragon" },
   { id: 4, name: "Monitor Samsung", quantity: 15, price: 1200000, category: "Electrónica", provider: "Samsung" },
+  {
+    id: 5,
+    name: "Silla Ergonómica",
+    quantity: 3,
+    price: 750000,
+    category: "Mobiliario",
+  },
+  {
+    id: 6,
+    name: "Mouse Logitech G502",
+    quantity: 20,
+    price: 15000,
+    category: "Accesorios",
+    provider: "Logitech",
+  },
+  {
+    id: 7,
+    name: "Disco Duro SSD 1TB",
+    quantity: 8,
+    price: 1000000,
+    description: "Disco duro de 1TB con velocidad de 500 MB/s.",
+    category: "Almacenamiento",
+    image: "/inventory/discoDuro.jpg",
+  },
+  {
+    id: 8,
+    name: "Mouse Razer DeathAdder",
+    quantity: 15,
+    price: 20000,
+    category: "Accesorios",
+    provider: "Razer",
+  },
+  {
+    id: 9,
+    name: "Teclado Genius G15",
+    quantity: 5,
+    price: 18000,
+    category: "Accesorios",
+    provider: "Genius",
+  },
 ];
 
 const ProductsPage = () => {
@@ -74,10 +115,13 @@ const ProductsPage = () => {
                 </tr>
               </thead>
               <tbody className="table-body">
-                {filteredProducts.map((product) => (
-                  <tr
+                {filteredProducts.map((product, index) => (
+                  <motion.tr
                     key={product.id}
                     className="table-row"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
                     <td className="table-cell">{product.name}</td>
                     <td className="table-cell">{product.quantity}</td>
@@ -96,7 +140,7 @@ const ProductsPage = () => {
                         </Button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>

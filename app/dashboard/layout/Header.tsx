@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useTheme } from "@/app/hooks/use-theme";
 import { Bell, ChevronLeft, Moon, Search, Sun } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface HeaderProps {
   collapsed: boolean;
@@ -11,6 +13,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
   const { theme, setTheme } = useTheme();
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <header className="relative z-10 flex h-[60px] items-center justify-between bg-white px-4 shadow-md transition-colors dark:bg-slate-950">
@@ -21,26 +24,33 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
         >
           <ChevronLeft className={collapsed ? "rotate-180" : ""} />
         </button>
-        <div className="input">
+
+        {/* Input con animación */}
+        <motion.div
+          className="relative flex items-center overflow-hidden rounded-md border border-slate-300 bg-white px-2 transition-all dark:bg-slate-800"
+          animate={{ width: isFocused ? 240 : 160, height: 35 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
           <Search
             size={20}
-            className="text-slate-300"
+            className="text-slate-400"
           />
           <input
             type="text"
             name="search"
             id="search"
-            placeholder="Search..."
-            className="w-full bg-transparent text-slate-900 outline-0 placeholder:text-slate-300 dark:text-slate-300"
+            placeholder="Buscar..."
+            className="w-full bg-transparent text-slate-900 outline-0 placeholder:text-slate-400 dark:text-slate-300"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
           />
-        </div>
+        </motion.div>
       </div>
+
       <div className="flex items-center gap-x-3">
         <button
           className="btn-ghost size-10"
-          onClick={() => {
-            setTheme(theme === "light" ? "dark" : "light");
-          }}
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         >
           <Sun
             size={20}

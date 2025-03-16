@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, X, Filter } from "lucide-react";
 import Footer from "../layout/Footer";
 import { useState } from "react";
+import { motion } from "framer-motion"; // Importar framer-motion
 
 type User = {
   id: number;
@@ -17,6 +18,13 @@ const mockVerifiedUsers: User[] = [
   { id: 1, name: "Juan Pérez", email: "juan@example.com", status: "Pending" },
   { id: 2, name: "Ana López", email: "ana@example.com", status: "Approved" },
   { id: 3, name: "Carlos Gómez", email: "carlos@example.com", status: "Denied" },
+  { id: 4, name: "Ana Rodríguez", email: "ana@example.com", status: "Pending" },
+  { id: 5, name: "Carlos López", email: "carlos@example.com", status: "Denied" },
+  { id: 6, name: "Juan Pérez", email: "juan@example.com", status: "Pending" },
+  { id: 7, name: "María Gómez", email: "maria@example.com", status: "Approved" },
+  { id: 8, name: "Carlos López", email: "carlos@example.com", status: "Denied" },
+  { id: 9, name: "María Gómez", email: "maria@example.com", status: "Denied" },
+  { id: 10, name: "Ana Rodríguez", email: "ana@example.com", status: "Denied" },
 ];
 
 const VerifiedUsersPage = () => {
@@ -41,7 +49,7 @@ const VerifiedUsersPage = () => {
         </Button>
       </div>
 
-      {/* Tabla de usuarios */}
+      {/* Tabla */}
       <div className="card">
         <div className="card-body p-0">
           <div className="relative h-[500px] w-full flex-shrink-0 overflow-auto rounded-none [scrollbar-width:_thin]">
@@ -55,15 +63,20 @@ const VerifiedUsersPage = () => {
                 </tr>
               </thead>
               <tbody className="table-body">
-                {users.map((user) => (
-                  <tr
+                {users.map((user, index) => (
+                  <motion.tr
                     key={user.id}
                     className="table-row"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }} // Animación progresiva
                   >
                     <td className="table-cell">{user.name}</td>
                     <td className="table-cell">{user.email}</td>
                     <td
-                      className={`table-cell font-semibold ${user.status === "Approved" ? "text-green-600" : user.status === "Denied" ? "text-red-600" : "text-yellow-600"}`}
+                      className={`table-cell font-semibold ${
+                        user.status === "Approved" ? "text-green-600" : user.status === "Denied" ? "text-red-600" : "text-yellow-600"
+                      }`}
                     >
                       {user.status}
                     </td>
@@ -87,7 +100,7 @@ const VerifiedUsersPage = () => {
                         </Button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { motion } from "framer-motion"; // Importar Framer Motion
 
 const NewProductPage = () => {
   const [product, setProduct] = useState({
@@ -49,7 +50,12 @@ const NewProductPage = () => {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }} // Empieza invisible y ligeramente abajo
+      animate={{ opacity: 1, y: 0 }} // Aparece y sube a su posición
+      transition={{ duration: 0.5, ease: "easeOut" }} // Suavidad en la animación
+      className="space-y-6 p-6"
+    >
       <h1 className="text-2xl font-bold text-black dark:text-white">Agregar Nuevo Producto</h1>
 
       {successMessage && <div className="rounded-md bg-green-500 p-3 text-white">{successMessage}</div>}
@@ -117,7 +123,7 @@ const NewProductPage = () => {
           <Button variant="destructive">Agregar Producto</Button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

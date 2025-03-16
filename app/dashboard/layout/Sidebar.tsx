@@ -3,14 +3,18 @@
 import { forwardRef } from "react";
 import { cn } from "../utils/cn";
 import Image from "next/image";
-import Link from "next/link"; // Importa Link de Next.js
+import Link from "next/link";
 import { navbarLinks } from "@/app/constants";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion"; // Importa motion
 
 interface SidebarProps {
-  collapsed?: boolean; // Especificamos que es un booleano opcional
+  collapsed?: boolean;
 }
 
 const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ collapsed }, ref) => {
+  const pathname = usePathname(); // Obtiene la ruta actual
+
   return (
     <aside
       ref={ref}
@@ -38,21 +42,37 @@ const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ collapsed }, ref) => {
             className={cn("sidebar-group", collapsed && "md:items-center")}
           >
             <p className={cn("sidebar-group-title", collapsed && "md:w-[45px]")}>{navbarLink.title}</p>
-            {navbarLink.links.map((link) => (
-              <Link
-                key={link.label}
-                href={link.path} // Usa href en lugar de to
-                className={cn("sidebar-item", collapsed && "md:w-[45px]")}
-              >
-                {link.icon && (
-                  <link.icon
-                    size={22}
-                    className="flex-shrink-0"
-                  />
-                )}
-                {!collapsed && <p className="whitespace-nowrap">{link.label}</p>}
-              </Link>
-            ))}
+            {navbarLink.links.map((link) => {
+              const isActive = pathname === link.path; // Verifica si el link es el activo
+              return (
+                <Link
+                  key={link.label}
+                  href={link.path}
+                  className={cn(
+                    "relative flex items-center gap-3 rounded-md p-2 transition-all duration-300",
+                    collapsed ? "md:w-[45px]" : "md:w-full",
+                    isActive ? "text-white dark:text-white" : "text-gray-700 dark:text-gray-300",
+                  )}
+                >
+                  {link.icon && (
+                    <link.icon
+                      size={22}
+                      className="flex-shrink-0"
+                    />
+                  )}
+                  {!collapsed && <p className="whitespace-nowrap">{link.label}</p>}
+
+                  {/* Animación de fondo activo */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeSidebar"
+                      className="absolute inset-0 -z-10 rounded-md bg-blue-500 dark:bg-blue-600"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
         ))}
       </div>

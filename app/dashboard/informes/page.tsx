@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Download, Upload, Filter } from "lucide-react";
 import Image from "next/image";
 import Footer from "../layout/Footer";
+import { motion } from "framer-motion";
 
 const ReportsPage = () => {
   return (
-    <div className="space-y-6 p-6">
+    <motion.div
+      className="space-y-6 p-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="card-header">
         <p className="title">Informes</p>
       </div>
@@ -43,10 +49,13 @@ const ReportsPage = () => {
                 </tr>
               </thead>
               <tbody className="table-body">
-                {mockReports.map((report) => (
-                  <tr
+                {mockReports.map((report, i) => (
+                  <motion.tr
                     key={report.id}
                     className="table-row"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.1 }}
                   >
                     <td className="table-cell">{report.date}</td>
                     <td className="table-cell">{report.type}</td>
@@ -60,7 +69,7 @@ const ReportsPage = () => {
                         Excel
                       </Button>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
@@ -76,7 +85,7 @@ const ReportsPage = () => {
           <Image
             src="/integrations/google_drive.svg"
             alt="Google Drive"
-            width={20} // Ajusta el tamaño según necesites
+            width={20}
             height={20}
             className="ml-2"
           />
@@ -86,8 +95,8 @@ const ReportsPage = () => {
           Importar desde Dropbox
           <Image
             src="/integrations/dropbox.svg"
-            alt="Google Drive"
-            width={20} // Ajusta el tamaño según necesites
+            alt="Dropbox"
+            width={20}
             height={20}
             className="ml-2"
           />
@@ -101,7 +110,7 @@ const ReportsPage = () => {
           <Image
             src="/integrations/google_drive.svg"
             alt="Google Drive"
-            width={20} // Ajusta el tamaño según necesites
+            width={20}
             height={20}
             className="ml-2"
           />
@@ -111,15 +120,15 @@ const ReportsPage = () => {
           Exportar a Dropbox
           <Image
             src="/integrations/dropbox.svg"
-            alt="Google Drive"
-            width={20} // Ajusta el tamaño según necesites
+            alt="Dropbox"
+            width={20}
             height={20}
             className="ml-2"
           />
         </Button>
       </div>
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

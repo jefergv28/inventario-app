@@ -1,106 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
-interface Movement {
-  id: number;
-  date: string;
-  user: string;
-  product: string;
-  type: "entrada" | "salida";
-  quantity: number;
-}
-
-const MovementsPage = () => {
-  const [movements, setMovements] = useState<Movement[]>([
-    { id: 1, date: "2025-03-15", user: "Admin", product: "Laptop", type: "entrada", quantity: 10 },
-    { id: 2, date: "2025-03-14", user: "Empleado1", product: "Mouse", type: "salida", quantity: 5 },
+const LowStockPage = () => {
+  const [lowStockProducts] = useState([
+    { id: 1, name: "Producto A", stock: 2, provider: "Proveedor X" },
+    { id: 2, name: "Producto B", stock: 5, provider: "Proveedor Y" },
+    { id: 3, name: "Producto C", stock: 10, provider: "Proveedor Z" },
+    { id: 4, name: "Producto D", stock: 15, provider: "Proveedor A" },
+    { id: 5, name: "Producto E", stock: 20, provider: "Proveedor B" },
+    { id: 6, name: "Producto F", stock: 25, provider: "Proveedor C" },
+    { id: 7, name: "Producto G", stock: 30, provider: "Proveedor D" },
+    { id: 8, name: "Producto H", stock: 35, provider: "Proveedor E" },
+    { id: 9, name: "Producto I", stock: 40, provider: "Proveedor F" },
+    { id: 10, name: "Producto J", stock: 45, provider: "Proveedor G" },
   ]);
-  const [filters, setFilters] = useState({ date: "", user: "", product: "", type: "" });
-  const [newMovement, setNewMovement] = useState({ product: "", type: "entrada", quantity: 0 });
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    // Aquí podrías cargar los productos con bajo stock desde una API
+  }, []);
 
-  const filteredMovements = movements.filter((m) =>
-    (filters.date ? m.date.includes(filters.date) : true) &&
-    (filters.user ? m.user.includes(filters.user) : true) &&
-    (filters.product ? m.product.includes(filters.product) : true) &&
-    (filters.type ? m.type === filters.type : true)
-  );
-
-  const handleNewMovement = () => {
-    if (!newMovement.product || newMovement.quantity <= 0) return;
-    setMovements([
-      ...movements,
-      {
-        id: movements.length + 1,
-        date: new Date().toISOString().split("T")[0],
-        user: "Admin",
-        product: newMovement.product,
-        type: newMovement.type as "entrada" | "salida",
-        quantity: newMovement.quantity,
-      },
-    ]);
-    setNewMovement({ product: "", type: "entrada", quantity: 0 });
+  const handleRestock = (id: number) => {
+    console.log(`Solicitar reabastecimiento para producto con ID ${id}`);
   };
 
   return (
     <div className="space-y-6 p-6">
-      <h1 className="text-2xl font-bold">Movimientos de Inventario</h1>
-
-      {/* Filtros */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <input type="date" name="date" value={filters.date} onChange={handleFilterChange} className="input" />
-        <input type="text" name="user" placeholder="Usuario" value={filters.user} onChange={handleFilterChange} className="input" />
-        <input type="text" name="product" placeholder="Producto" value={filters.product} onChange={handleFilterChange} className="input" />
-        <select name="type" value={filters.type} onChange={handleFilterChange} className="input">
-          <option value="">Todos</option>
-          <option value="entrada">Entrada</option>
-          <option value="salida">Salida</option>
-        </select>
-      </div>
-
-      {/* Tabla de movimientos */}
-      <table className="w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-2">Fecha</th>
-            <th className="p-2">Usuario</th>
-            <th className="p-2">Producto</th>
-            <th className="p-2">Tipo</th>
-            <th className="p-2">Cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredMovements.map((m) => (
-            <tr key={m.id} className="border-t">
-              <td className="p-2">{m.date}</td>
-              <td className="p-2">{m.user}</td>
-              <td className="p-2">{m.product}</td>
-              <td className={`p-2 ${m.type === "salida" ? "text-red-500" : "text-green-500"}`}>{m.type}</td>
-              <td className="p-2">{m.quantity}</td>
+      <h1 className="title">Stock Bajo</h1>
+      <p className="text-gray-600 dark:text-white/50">Lista de productos que requieren reabastecimiento.</p>
+      <div className="rounded-lg border p-4 shadow-md">
+        <table className="table">
+          <thead className="table-header">
+            <tr className="table-row">
+              <th className="table-head">Producto</th>
+              <th className="table-head">Stock</th>
+              <th className="table-head">Proveedor</th>
+              <th className="table-head">Acción</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Agregar nuevo movimiento */}
-      <div className="border p-4 rounded-lg">
-        <h2 className="text-lg font-bold">Registrar Movimiento</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-          <input type="text" placeholder="Producto" value={newMovement.product} onChange={(e) => setNewMovement({ ...newMovement, product: e.target.value })} className="input" />
-          <select value={newMovement.type} onChange={(e) => setNewMovement({ ...newMovement, type: e.target.value })} className="input">
-            <option value="entrada">Entrada</option>
-            <option value="salida">Salida</option>
-          </select>
-          <input type="number" placeholder="Cantidad" value={newMovement.quantity} onChange={(e) => setNewMovement({ ...newMovement, quantity: parseInt(e.target.value) || 0 })} className="input" />
-        </div>
-        <button onClick={handleNewMovement} className="button mt-4">Registrar Movimiento</button>
+          </thead>
+          <tbody>
+            {lowStockProducts.map((product, index) => (
+              <motion.tr
+                key={product.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="table-row"
+              >
+                <td className="table-cell">{product.name}</td>
+                <td className="table-cell font-bold text-red-500">{product.stock}</td>
+                <td className="table-cell">{product.provider}</td>
+                <td className="table-cell">
+                  <Button onClick={() => handleRestock(product.id)} variant="secondary">
+                    Reabastecer
+                  </Button>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
 
-export default MovementsPage;
+export default LowStockPage;

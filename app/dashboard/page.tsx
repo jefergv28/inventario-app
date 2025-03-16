@@ -5,6 +5,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { overviewData, ProductosData, recentProductsData } from "../constants";
 import Image from "next/image";
 import Footer from "./layout/Footer";
+import { motion } from "framer-motion";
 
 export default function Dashboard() {
   const { theme } = useTheme();
@@ -157,10 +158,13 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="table-body">
-                {ProductosData.map((Productos) => (
-                  <tr
+                {ProductosData.map((Productos, index) => (
+                  <motion.tr
                     key={Productos.id}
                     className="table-row"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
                   >
                     <td className="table-cell">{Productos.id}</td>
                     <td className="table-cell">
@@ -186,7 +190,7 @@ export default function Dashboard() {
                         </button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
@@ -209,7 +213,13 @@ interface CardProps {
 // ✅ Aplicar el tipo a las props del componente
 function Card({ icon, title, value, percentage }: CardProps) {
   return (
-    <div className="card">
+    <motion.div
+      className="card"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      whileHover={{ scale: 1.05 }}
+    >
       <div className="card-header">
         <div className="w-fit rounded-lg bg-blue-500/20 p-2 text-blue-500 transition-colors dark:bg-blue-600/20 dark:text-blue-600">{icon}</div>
         <p className="card-title">{title}</p>
@@ -221,6 +231,6 @@ function Card({ icon, title, value, percentage }: CardProps) {
           {percentage}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 }

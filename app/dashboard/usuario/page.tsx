@@ -4,12 +4,33 @@ import { Button } from "@/components/ui/button";
 import { Filter, Edit, Trash2 } from "lucide-react";
 import Footer from "../layout/Footer";
 import { useState } from "react";
+import { motion } from "framer-motion"; // Importamos Framer Motion
 
 const mockUsers = [
   { id: 1, name: "Juan Pérez", role: "Administrador" },
   { id: 2, name: "María Gómez", role: "Empleado" },
   { id: 3, name: "Carlos López", role: "Empleado" },
   { id: 4, name: "Ana Rodríguez", role: "Administrador" },
+  {
+    id: 5,
+    name: "Pedro García",
+    role: "Empleado",
+  },
+  {
+    id: 6,
+    name: "Luis Martínez",
+    role: "Empleado",
+  },
+  {
+    id: 7,
+    name: "Marta Fernández",
+    role: "Empleado",
+  },
+  {
+    id: 8,
+    name: "José Martínez",
+    role: "Empleado",
+  },
 ];
 
 const UsersPage = () => {
@@ -53,10 +74,17 @@ const UsersPage = () => {
                 </tr>
               </thead>
               <tbody className="table-body">
-                {filteredUsers.map((user) => (
-                  <tr
+                {filteredUsers.map((user, index) => (
+                  <motion.tr
                     key={user.id}
                     className="table-row"
+                    initial={{ opacity: 0, y: 10 }} // Estado inicial: invisible y desplazado hacia abajo
+                    animate={{ opacity: 1, y: 0 }} // Estado final: visible y en su posición
+                    transition={{
+                      duration: 0.4,
+                      delay: index * 0.1, // Efecto escalonado
+                      ease: "easeOut",
+                    }}
                   >
                     <td className="table-cell">{user.name}</td>
                     <td className="table-cell">{user.role}</td>
@@ -72,7 +100,7 @@ const UsersPage = () => {
                         </Button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
