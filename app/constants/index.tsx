@@ -40,17 +40,17 @@ export const navbarLinks = [
       {
         label: "Usuario",
         icon: Users,
-        path: "/customers",
+        path: "/dashboard/usuario",
       },
       {
         label: "Nuevo Usuario",
         icon: UserPlus,
-        path: "/new-customer",
+        path: "/dashboard/newuser",
       },
       {
         label: "Usuarios Verificados",
         icon: UserCheck,
-        path: "/verified-customers",
+        path: "/dashboard/usuarioVerif",
       },
     ],
   },
@@ -60,12 +60,12 @@ export const navbarLinks = [
       {
         label: "Productos",
         icon: Package,
-        path: "/products",
+        path: "/dashboard/productos",
       },
       {
         label: "Nuevo producto",
         icon: PackagePlus,
-        path: "/new-product",
+        path: "/dashboard/newProductos",
       },
     ],
   },
@@ -76,17 +76,17 @@ export const navbarLinks = [
       {
         label: "Inventario",
         icon: ShoppingBag,
-        path: "/inventory",
+        path: "/dashboard/inventario",
       },
       {
         label: "Stock Bajo",
         icon: AlertTriangle,
-        path: "/inventory/low-stock",
+        path: "/dashboard/stock",
       },
       {
         label: "Movimientos",
         icon: List,
-        path: "/inventory/movements",
+        path: "/dashboard/movimientos",
       },
     ],
   },
@@ -96,7 +96,7 @@ export const navbarLinks = [
       {
         label: "Settings",
         icon: Settings,
-        path: "/settings",
+        path: "/dashboard/settings",
       },
     ],
   },

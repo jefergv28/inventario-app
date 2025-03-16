@@ -11,10 +11,10 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground shadow hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/80",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 dark:bg-red-600 dark:text-white dark:hover:bg-red-500",
+          "bg-[#FF0A0E] hover:bg-[#FF0A0E]/80  dark:bg-destructive text-destructive-foreground shadow-sm dark:hover:bg-destructive/90 dark:bg-red-600 dark:text-white dark:hover:bg-red-500",
         outline:
-          "border border-input bg-[#3050B0] shadow-sm hover:bg-accent hover:text-accent-foreground dark:border-white/10 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700",
-        secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600",
+          "border border-input bg-[#3050B0] shadow-sm hover:bg-accent hover:text-white dark:border-white/10 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700",
+        secondary: "bg-[#0D0221] text-white shadow-sm hover:bg-[#3050B0] dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600",
         ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-700 dark:hover:text-white",
         link: "text-primary underline-offset-4 hover:underline dark:text-blue-400 dark:hover:text-blue-300",
       },
