@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Inventario Pro
 
-## Getting Started
+Inventario Pro es una aplicación web para la gestión eficiente de inventarios. Permite registrar productos, gestionar stock, analizar estadísticas y optimizar la administración de recursos mediante una interfaz intuitiva.
 
-First, run the development server:
+## 🚀 Características
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 📦 **Gestión de productos**: Agregar, modificar y eliminar productos.
+- 🔍 **Búsqueda avanzada**: Encuentra productos fácilmente con un buscador global.
+- 📊 **Estadísticas interactivas**: Gráficos de tendencias de stock y movimientos.
+- 🏷 **Gestión de proveedores**: Registro y administración de proveedores.
+- 🔔 **Notificaciones**: Avisos sobre stock bajo y movimientos recientes.
+- 🔐 **Control de usuarios**: Roles y permisos para diferentes tipos de usuarios.
+
+## 🛠 Tecnologías utilizadas
+
+- **Next.js** (Framework de React para el frontend)
+- **TypeScript** (Tipado estático para mayor seguridad y escalabilidad)
+- **Tailwind CSS** (Estilos modernos y personalizables)
+- **Recharts** (Gráficos dinámicos y visualización de datos)
+- **Spring Boot** (Backend en Java para la gestión de datos)
+- **MySQL** (Base de datos para almacenamiento de productos y usuarios)
+
+## 📦 Instalación y ejecución
+
+1. Clona este repositorio:
+
+   ```bash
+   git clone https://github.com/tu-usuario/inventario-pro.git
+   cd inventario-pro
+   ```
+
+2. Instala las dependencias:
+
+   ```bash
+   npm install
+   # o
+   pnpm install
+   ```
+
+3. Inicia el servidor de desarrollo:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+
+## 📂 Estructura del proyecto
+
+```
+/inventario-pro
+ ├── app/                # Directorio principal del proyecto Next.js
+ │   ├── dashboard/      # Panel de administración
+ │   ├── settings/       # Configuración del usuario
+ │   ├── auth/           # Páginas de autenticación
+ │   └── page.tsx        # Página principal
+ ├── components/         # Componentes reutilizables
+ ├── hooks/              # Custom hooks
+ ├── services/           # Llamadas a API y lógica de negocio
+ ├── styles/             # Estilos globales
+ ├── public/             # Imágenes y recursos estáticos
+ ├── package.json        # Dependencias y configuración
+ └── README.md           # Documentación del proyecto
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Despliegue en Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para desplegar en Vercel, sigue estos pasos:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Crea una cuenta en [Vercel](https://vercel.com/).
+2. Conéctate con GitHub y selecciona el repositorio del proyecto.
+3. Configura las variables de entorno necesarias.
+4. Haz clic en "Deploy" y espera a que Vercel genere la URL de tu aplicación.
 
-## Learn More
+## 🤝 Contribuciones
 
-To learn more about Next.js, take a look at the following resources:
+¡Las contribuciones son bienvenidas! Si deseas mejorar este proyecto, sigue estos pasos:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Haz un fork del repositorio.
+2. Crea una rama con tu nueva funcionalidad (`git checkout -b feature-nueva`).
+3. Realiza cambios y haz commit (`git commit -m "Agrega nueva funcionalidad"`).
+4. Sube los cambios (`git push origin feature-nueva`).
+5. Abre un pull request y descríbelo.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 Licencia
 
-## Deploy on Vercel
+Este proyecto está bajo la licencia MIT. Puedes usarlo, modificarlo y distribuirlo libremente.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+💡 _Desarrollado por [Jeferson](https://github.com/jefergv28)._
