@@ -25,7 +25,7 @@ Inventario Pro es una aplicación web para la gestión eficiente de inventarios.
 1. Clona este repositorio:
 
    ```bash
-   git clone https://github.com/tu-usuario/inventario-pro.git
+   git clone https://github.com/jefergv28/inventario-app.git
    cd inventario-pro
    ```
 
