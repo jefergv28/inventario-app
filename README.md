@@ -1,91 +1,146 @@
-# Inventario Pro
-
+📦 Inventario Pro
 Inventario Pro es una aplicación web para la gestión eficiente de inventarios. Permite registrar productos, gestionar stock, analizar estadísticas y optimizar la administración de recursos mediante una interfaz intuitiva.
 
-## 🚀 Características
+🚀 Características
+✅ Gestión de productos: Agregar, modificar y eliminar productos.
+🔍 Búsqueda avanzada: Encuentra productos fácilmente con un buscador global.
+📊 Estadísticas interactivas: Gráficos de tendencias de stock y movimientos.
+🏷 Gestión de proveedores: Registro y administración de proveedores.
+🔔 Notificaciones: Avisos sobre stock bajo y movimientos recientes.
+🔐 Control de usuarios: Roles y permisos para diferentes tipos de usuarios.
 
-- 📦 **Gestión de productos**: Agregar, modificar y eliminar productos.
-- 🔍 **Búsqueda avanzada**: Encuentra productos fácilmente con un buscador global.
-- 📊 **Estadísticas interactivas**: Gráficos de tendencias de stock y movimientos.
-- 🏷 **Gestión de proveedores**: Registro y administración de proveedores.
-- 🔔 **Notificaciones**: Avisos sobre stock bajo y movimientos recientes.
-- 🔐 **Control de usuarios**: Roles y permisos para diferentes tipos de usuarios.
+🛠 Tecnologías utilizadas
+Frontend
+Next.js (Framework de React para el frontend)
 
-## 🛠 Tecnologías utilizadas
+TypeScript (Tipado estático para mayor seguridad y escalabilidad)
 
-- **Next.js** (Framework de React para el frontend)
-- **TypeScript** (Tipado estático para mayor seguridad y escalabilidad)
-- **Tailwind CSS** (Estilos modernos y personalizables)
-- **Recharts** (Gráficos dinámicos y visualización de datos)
-- **Spring Boot** (Backend en Java para la gestión de datos)
-- **MySQL** (Base de datos para almacenamiento de productos y usuarios)
+Tailwind CSS (Estilos modernos y personalizables)
 
-## 📦 Instalación y ejecución
+Recharts (Gráficos dinámicos y visualización de datos)
 
-1. Clona este repositorio:
+Backend
+Spring Boot (API en Java para la gestión de datos)
 
-   ```bash
-   git clone https://github.com/jefergv28/inventario-app.git
-   cd inventario-pro
-   ```
+MySQL (Base de datos para almacenamiento de productos y usuarios)
 
-2. Instala las dependencias:
+Spring Security + JWT (Autenticación y autorización)
 
-   ```bash
-   npm install
-   # o
-   pnpm install
-   ```
+📦 Instalación y ejecución
+1️⃣ Clona este repositorio:
+bash
+Copiar
+Editar
+git clone https://github.com/jefergv28/inventario-app.git
+cd inventario-app
+2️⃣ Configura el Backend
+Crea un archivo .env en la carpeta del backend (inventario-pro-api/) con el siguiente contenido:
 
-3. Inicia el servidor de desarrollo:
+env
+Copiar
+Editar
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/inventario_db
+SPRING_DATASOURCE_USERNAME=tu_usuario
+SPRING_DATASOURCE_PASSWORD=tu_contraseña
+JWT_SECRET=clave_super_secreta
+Luego, ejecuta:
 
-   ```bash
-   npm run dev
-   ```
+bash
+Copiar
+Editar
+cd inventario-pro-api
+mvn spring-boot:run
+3️⃣ Configura el Frontend
+Instala las dependencias:
 
-4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+bash
+Copiar
+Editar
+cd ../inventario-pro
+npm install
 
-## 📂 Estructura del proyecto
+# o
 
-```
-/inventario-pro
- ├── app/                # Directorio principal del proyecto Next.js
- │   ├── dashboard/      # Panel de administración
- │   ├── settings/       # Configuración del usuario
- │   ├── auth/           # Páginas de autenticación
- │   └── page.tsx        # Página principal
- ├── components/         # Componentes reutilizables
- ├── hooks/              # Custom hooks
- ├── services/           # Llamadas a API y lógica de negocio
- ├── styles/             # Estilos globales
- ├── public/             # Imágenes y recursos estáticos
- ├── package.json        # Dependencias y configuración
- └── README.md           # Documentación del proyecto
-```
+pnpm install
+Inicia el servidor de desarrollo:
 
-## 🚀 Despliegue en Vercel
+bash
+Copiar
+Editar
+npm run dev
+Abre http://localhost:3000 en tu navegador.
 
-Para desplegar en Vercel, sigue estos pasos:
+📂 Estructura del Proyecto
+bash
+Copiar
+Editar
+/inventario-app
+├── inventario-pro/ # Frontend con Next.js
+│ ├── app/ # Directorio principal
+│ ├── components/ # Componentes reutilizables
+│ ├── services/ # Llamadas a API
+│ ├── styles/ # Estilos globales
+│ ├── public/ # Imágenes y recursos estáticos
+│ ├── package.json # Dependencias
+│ └── README.md # Documentación del frontend
+├── inventario-pro-api/ # Backend con Spring Boot
+│ ├── src/main/java/ # Código fuente
+│ ├── src/main/resources/ # Configuración y properties
+│ ├── pom.xml # Dependencias de Maven
+│ └── README.md # Documentación del backend
+└── README.md # Este documento
+🔑 Roles y Permisos
+👑 Administrador: Puede agregar, editar y eliminar productos, gestionar usuarios y visualizar estadísticas.
 
-1. Crea una cuenta en [Vercel](https://vercel.com/).
-2. Conéctate con GitHub y selecciona el repositorio del proyecto.
-3. Configura las variables de entorno necesarias.
-4. Haz clic en "Deploy" y espera a que Vercel genere la URL de tu aplicación.
+👤 Usuario estándar: Solo puede visualizar el inventario y realizar búsquedas.
 
-## 🤝 Contribuciones
+📌 Ejemplo de Requests a la API
+🔐 Autenticación (Login)
+bash
+Copiar
+Editar
+POST http://localhost:8000/auth/login
+Content-Type: application/json
 
-¡Las contribuciones son bienvenidas! Si deseas mejorar este proyecto, sigue estos pasos:
+{
+"email": "admin@email.com",
+"password": "admin123"
+}
+📦 Obtener Productos
+bash
+Copiar
+Editar
+GET http://localhost:8000/api/productos
+Authorization: Bearer <TOKEN>
+🚀 Despliegue en Vercel
+Para desplegar en Vercel:
 
-1. Haz un fork del repositorio.
-2. Crea una rama con tu nueva funcionalidad (`git checkout -b feature-nueva`).
-3. Realiza cambios y haz commit (`git commit -m "Agrega nueva funcionalidad"`).
-4. Sube los cambios (`git push origin feature-nueva`).
-5. Abre un pull request y descríbelo.
+Crea una cuenta en Vercel.
 
-## 📄 Licencia
+Conéctate con GitHub y selecciona el repositorio.
 
-Este proyecto está bajo la licencia MIT. Puedes usarlo, modificarlo y distribuirlo libremente.
+Configura las variables de entorno necesarias.
 
----
+Haz clic en Deploy y espera a que se genere la URL.
 
-💡 _Desarrollado por [Jeferson](https://github.com/jefergv28)._
+📹 Demo y Capturas
+🚀 Ver demo en video (Sube el video a YouTube y pon el enlace aquí)
+
+📌 Capturas de pantalla:
+(Aquí debes agregar imágenes de la aplicación en acción)
+
+🤝 Contribuciones
+¡Las contribuciones son bienvenidas! Para colaborar:
+
+Haz un fork del repositorio.
+
+Crea una nueva rama (git checkout -b feature-nueva).
+
+Realiza cambios y haz commit (git commit -m "Agrega nueva funcionalidad").
+
+Sube los cambios (git push origin feature-nueva).
+
+Abre un Pull Request en GitHub.
+
+📄 Licencia
+Este proyecto está bajo la licencia MIT, lo que significa que puedes usarlo, modificarlo y distribuirlo libremente.
