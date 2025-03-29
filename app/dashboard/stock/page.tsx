@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Footer from "../layout/Footer";
 
 const LowStockPage = () => {
   const [lowStockProducts] = useState([
@@ -65,6 +66,7 @@ const LowStockPage = () => {
           </tbody>
         </table>
       </div>
+      <Footer />
     </div>
   );
 };

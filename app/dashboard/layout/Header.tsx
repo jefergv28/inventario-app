@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useTheme } from "@/app/hooks/use-theme";
-import { Bell, ChevronLeft, Moon, Search, Sun } from "lucide-react";
+import { Bell, ChevronLeft, Moon, Search, Sun, LogOut } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { signOut } from "next-auth/react"; // 🔥 Importamos signOut
 
 interface HeaderProps {
   collapsed: boolean;
@@ -14,6 +15,11 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
   const { theme, setTheme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/auth/login" }); // 🔥 Cierra sesión y redirige a /auth/login
+  };
 
   return (
     <header className="relative z-10 flex h-[60px] items-center justify-between bg-white px-4 shadow-md transition-colors dark:bg-slate-950">
@@ -47,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
         </motion.div>
       </div>
 
-      <div className="flex items-center gap-x-3">
+      <div className="relative flex items-center gap-x-3">
         <button
           className="btn-ghost size-10"
           onClick={() => setTheme(theme === "light" ? "dark" : "light")}
@@ -64,15 +70,39 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
         <button className="btn-ghost size-10">
           <Bell size={20} />
         </button>
-        <button className="size-10 overflow-hidden rounded-full">
-          <Image
-            src="/profile-image.jpg"
-            alt="Perfil"
-            width={40}
-            height={40}
-            className="size-full object-cover"
-          />
-        </button>
+
+        {/* Imagen de perfil con menú desplegable */}
+        <div className="relative">
+          <button
+            className="size-10 overflow-hidden rounded-full"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <Image
+              src="/profile-image.jpg"
+              alt="Perfil"
+              width={40}
+              height={40}
+              className="size-full object-cover"
+            />
+          </button>
+
+          {/* Menú desplegable */}
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute right-0 mt-2 w-40 rounded-md border bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900"
+            >
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-red-500 hover:bg-red-100 dark:hover:bg-red-900"
+              >
+                <LogOut size={16} /> Cerrar sesión
+              </button>
+            </motion.div>
+          )}
+        </div>
       </div>
     </header>
   );

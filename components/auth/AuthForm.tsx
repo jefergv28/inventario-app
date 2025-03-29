@@ -3,13 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import Logo from "../Logo";
-import SocialAuth from "./SocialAuth";
 import { motion } from "framer-motion";
 import { fadeInOnScroll } from "@/motion/motionVariants";
 import Button from "../Button";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import SocialAuth from "./SocialAuth";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -21,11 +19,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
+  const [feedback, setFeedback] = useState("");
   const router = useRouter();
 
   // Validaciones
   const validateFullName = (value: string) => {
-    if (type === "register" && value.trim().length < 3) {
+    if (value.trim().length < 3) {
       return "El nombre debe tener al menos 3 caracteres.";
     }
     return "";
@@ -70,32 +69,63 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     e.preventDefault();
 
     const newErrors = {
-      fullName: validateFullName(fullName),
+      fullName: type === "register" ? validateFullName(fullName) : "",
       email: validateEmail(email),
       password: validatePassword(password),
     };
 
     setErrors(newErrors);
 
+    // Si hay errores, detener
     if (Object.values(newErrors).some((error) => error)) {
       console.log("Errores en el formulario:", newErrors);
       return;
     }
 
-    if (type === "login") {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+    try {
+      if (type === "register") {
+        // Registro
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/registro`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ fullName, email, password, role: "ROLE_USER" }),
+        });
 
-      if (res?.ok) {
-        router.push("/dashboard");
-      } else {
-        console.error("Error en login:", res?.error);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Registro exitoso:", data.message);
+          setFeedback(data.message);
+          setTimeout(() => router.push("/auth/login"), 2000);
+        } else {
+          const error = await response.json();
+          console.error("Error:", error.message);
+          setFeedback(`Error al registrar: ${error.message}`);
+        }
+      } else if (type === "login") {
+        // Login
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          const { token } = await response.json();
+          localStorage.setItem("token", token); // Guarda el token
+          setFeedback("Inicio de sesión exitoso.");
+          setTimeout(() => router.push("/dashboard"), 1000);
+        } else {
+          const error = await response.json();
+          setFeedback(`Error en inicio de sesión: ${error.message}`);
+        }
       }
-    } else {
-      console.log("Registro no implementado todavía.");
+    } catch (err) {
+      console.error("Error al conectar con el backend:", err);
+      setFeedback("Hubo un problema al conectar con el servidor.");
     }
   };
 
@@ -106,10 +136,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       whileInView="visible"
       className="flex w-full max-w-md flex-col items-center justify-center rounded-lg bg-accent/60 p-8 shadow-lg"
     >
-      <div className="flex h-20 w-52 items-center justify-center">
-        <Logo />
-      </div>
-
       <h2 className="mt-4 text-2xl font-bold">{type === "login" ? "Inicia sesión en tu cuenta" : "¡Únete a Inventario-Pro!"}</h2>
       <p className="text-gray-00 pointer-events-none mb-6 text-sm">
         {type === "login" ? "Ingresa tus credenciales para continuar." : "Crea tu cuenta y comienza a gestionar tu inventario."}
@@ -171,6 +197,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           />
         </div>
       </form>
+
+      {feedback && <p className="mt-4 text-center text-sm text-red-500">{feedback}</p>}
 
       <SocialAuth />
 
