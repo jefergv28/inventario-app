@@ -8,45 +8,39 @@ import { fadeInOnScroll } from "@/motion/motionVariants";
 import Button from "../Button";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SocialAuth from "./SocialAuth";
+import api from "@/app/hooks/useApi";
+import { AxiosError } from "axios";
 
-interface AuthFormProps {
+type AuthFormProps = {
   type: "login" | "register";
-}
+};
 
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState<string>("");
   const router = useRouter();
 
-  // Validaciones
-  const validateFullName = (value: string) => {
-    if (value.trim().length < 3) {
-      return "El nombre debe tener al menos 3 caracteres.";
-    }
+  const validateFullName = (value: string): string => {
+    if (value.trim().length < 3) return "El nombre debe tener al menos 3 caracteres.";
     return "";
   };
 
-  const validateEmail = (value: string) => {
+  const validateEmail = (value: string): string => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-      return "Ingresa un correo válido.";
-    }
+    if (!emailRegex.test(value)) return "Ingresa un correo válido.";
     return "";
   };
 
-  const validatePassword = (value: string) => {
-    if (value.length < 6) {
-      return "La contraseña debe tener al menos 6 caracteres.";
-    }
+  const validatePassword = (value: string): string => {
+    if (value.length < 6) return "La contraseña debe tener al menos 6 caracteres.";
     return "";
   };
 
-  // Manejo de cambios en los inputs
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: string): void => {
     const { value } = e.target;
     const newErrors = { ...errors };
 
@@ -63,9 +57,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
     setErrors(newErrors);
   };
-
-  // Manejo del submit
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
     const newErrors = {
@@ -76,56 +68,36 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
     setErrors(newErrors);
 
-    // Si hay errores, detener
     if (Object.values(newErrors).some((error) => error)) {
       console.log("Errores en el formulario:", newErrors);
       return;
     }
 
     try {
-      if (type === "register") {
-        // Registro
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/registro`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ fullName, email, password, role: "ROLE_USER" }),
-        });
+      const endpoint = type === "register" ? "/auth/register" : "/auth/login";
+      const body = type === "register" ? { nombreCompleto: fullName, correo: email, contraseña: password } : { correo: email, contraseña: password };
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Registro exitoso:", data.message);
-          setFeedback(data.message);
-          setTimeout(() => router.push("/auth/login"), 2000);
-        } else {
-          const error = await response.json();
-          console.error("Error:", error.message);
-          setFeedback(`Error al registrar: ${error.message}`);
-        }
-      } else if (type === "login") {
-        // Login
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        });
+      const { data } = await api.post<{ token?: string }>(endpoint, body);
 
-        if (response.ok) {
-          const { token } = await response.json();
-          localStorage.setItem("token", token); // Guarda el token
-          setFeedback("Inicio de sesión exitoso.");
-          setTimeout(() => router.push("/dashboard"), 1000);
-        } else {
-          const error = await response.json();
-          setFeedback(`Error en inicio de sesión: ${error.message}`);
-        }
+      // Si es login, podrías guardar el token si viene en la respuesta
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
       }
-    } catch (err) {
-      console.error("Error al conectar con el backend:", err);
-      setFeedback("Hubo un problema al conectar con el servidor.");
+
+      setFeedback(type === "register" ? "Registro exitoso." : "Inicio de sesión exitoso.");
+      setTimeout(() => router.push("/dashboard"), 1000);
+    } catch (err: unknown) {
+      // Mostrar información completa del error
+      const axiosError = err as AxiosError<{ message: string }>;
+
+      // Agregar un console.log para ver toda la respuesta del error
+      console.log("Respuesta de error del backend:", axiosError.response); // Esto te mostrará toda la respuesta
+
+      // Obtener el mensaje de error y mostrarlo
+      const message = axiosError.response?.data?.message || `Error en la autenticación: ${axiosError.response?.statusText || "Desconocido"}`;
+
+      setFeedback(`Error: ${message}`);
+      console.error("Error en la autenticación:", message);
     }
   };
 
@@ -193,7 +165,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         <div className="flex flex-col items-center justify-center">
           <Button
             btnText={type === "login" ? "Iniciar sesión" : "Registrarse"}
-            disabled={Object.values(errors).some((error) => error)} // Deshabilita si hay errores
+            disabled={Object.values(errors).some((error) => error)}
           />
         </div>
       </form>

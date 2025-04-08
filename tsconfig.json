@@ -13,6 +13,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": ["next-auth"], // ⬅️ AGREGA ESTO
     "plugins": [
       {
         "name": "next"

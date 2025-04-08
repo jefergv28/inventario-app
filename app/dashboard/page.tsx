@@ -6,8 +6,16 @@ import { overviewData, ProductosData, recentProductsData } from "../constants";
 import Image from "next/image";
 import Footer from "./layout/Footer";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import router from "next/router";
 
 export default function Dashboard() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth/login?expired=1");
+    }
+  }, []);
   const { theme } = useTheme();
   return (
     <div className="flex flex-col gap-y-4">
