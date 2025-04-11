@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     // Mostrar mensaje si la sesión expiró
-    if (searchParams.get("expired") === "1") {
+    if (searchParams?.get("expired") === "1") {
       toast.warning("Tu sesión ha expirado. Por favor ingresa nuevamente.", {
         position: "top-center",
         autoClose: 5000,

@@ -1,62 +1,36 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn } from "./utils/cn";
 import { useRouter, usePathname } from "next/navigation";
-import { toast, ToastContainer } from "react-toastify";
+import { useSession } from "next-auth/react";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { cn } from "./utils/cn";
 import Header from "./layout/Header";
 import Sidebar from "./layout/Sidebar";
 import { useClickOutside } from "../hooks/use-click-outside";
-import { jwtDecode } from "jwt-decode";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+
   const [mounted, setMounted] = useState(false);
   const [isDesktopDevice, setIsDesktopDevice] = useState(false);
   const [collapsed, setCollapsed] = useState(!isDesktopDevice);
   const sidebarRef = useRef<HTMLElement>(null!);
-  const [tokenChecked, setTokenChecked] = useState(false);
 
+  // Esperar que NextAuth cargue, y redirigir si no hay sesión
   useEffect(() => {
-    const checkToken = () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        router.replace(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
-        return;
-      }
+    if (status === "unauthenticated") {
+      const redirectPath = encodeURIComponent(pathname || "/");
+      router.replace(`/auth/login?redirect=${redirectPath}`);
+    }
+  }, [status, router, pathname]);
 
-      try {
-        const decoded = jwtDecode<{ exp: number }>(token);
-        const isExpired = decoded.exp < Math.floor(Date.now() / 1000);
-
-        if (isExpired) {
-          toast.warning("Sesión expirada");
-          localStorage.removeItem("accessToken");
-          router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
-        }
-      } catch (error) {
-        console.error("Token inválido:", error);
-        localStorage.removeItem("accessToken");
-        router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
-      }
-    };
-
-    checkToken();
-    setTokenChecked(true);
-    const interval = setInterval(checkToken, 300000); // 5 minutos
-    return () => clearInterval(interval);
-  }, [router, pathname]);
-
-  useEffect(() => {
-    setCollapsed(!isDesktopDevice);
-  }, [isDesktopDevice]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
+  useEffect(() => setCollapsed(!isDesktopDevice), [isDesktopDevice]);
 
   useEffect(() => {
     if (mounted) {
@@ -77,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   });
 
-  if (!mounted || !tokenChecked) {
+  if (!mounted || status === "loading" || !session) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-accent_oscuro">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>

@@ -8,8 +8,7 @@ import { fadeInOnScroll } from "@/motion/motionVariants";
 import Button from "../Button";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SocialAuth from "./SocialAuth";
-import api from "@/app/hooks/useApi";
-import { AxiosError } from "axios";
+import { signIn } from "next-auth/react";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -20,7 +19,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    email?: string;
+    password?: string;
+  }>({});
   const [feedback, setFeedback] = useState<string>("");
   const router = useRouter();
 
@@ -57,6 +60,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
     setErrors(newErrors);
   };
+
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
@@ -74,30 +78,52 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     }
 
     try {
-      const endpoint = type === "register" ? "/auth/register" : "/auth/login";
-      const body = type === "register" ? { nombreCompleto: fullName, correo: email, contraseña: password } : { correo: email, contraseña: password };
+      if (type === "register") {
+        const res = await fetch("http://localhost:8000/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: fullName,
+            email: email,
+            password: password,
+          }),
+        });
 
-      const { data } = await api.post<{ token?: string }>(endpoint, body);
+        const data = await res.json();
 
-      // Si es login, podrías guardar el token si viene en la respuesta
-      if (data?.token) {
-        localStorage.setItem("token", data.token);
+        if (!res.ok) {
+          console.error("Respuesta del servidor:", data);
+          throw new Error(data.message || "Error al registrar");
+        }
+
+        // ✅ Guardar token si lo devuelve (opcional)
+        if (data.token) {
+          localStorage.setItem("authToken", data.token);
+        }
+
+        setFeedback("Registro exitoso. Redirigiendo al login...");
+        setTimeout(() => router.push("/auth/login"), 1500);
+      } else {
+        const res = await signIn("credentials", {
+          redirect: false,
+          email,
+          password,
+        });
+
+        if (res?.error) {
+          throw new Error(res.error);
+        }
+
+        setFeedback("Inicio de sesión exitoso. Redirigiendo...");
+        setTimeout(() => router.push("/dashboard"), 1000);
       }
-
-      setFeedback(type === "register" ? "Registro exitoso." : "Inicio de sesión exitoso.");
-      setTimeout(() => router.push("/dashboard"), 1000);
-    } catch (err: unknown) {
-      // Mostrar información completa del error
-      const axiosError = err as AxiosError<{ message: string }>;
-
-      // Agregar un console.log para ver toda la respuesta del error
-      console.log("Respuesta de error del backend:", axiosError.response); // Esto te mostrará toda la respuesta
-
-      // Obtener el mensaje de error y mostrarlo
-      const message = axiosError.response?.data?.message || `Error en la autenticación: ${axiosError.response?.statusText || "Desconocido"}`;
-
-      setFeedback(`Error: ${message}`);
-      console.error("Error en la autenticación:", message);
+    } catch (err) {
+      console.error("Error en auth:", err);
+      if (err instanceof Error) {
+        setFeedback(`Error: ${err.message}`);
+      } else {
+        setFeedback("Ocurrió un error inesperado.");
+      }
     }
   };
 

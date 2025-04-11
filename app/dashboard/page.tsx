@@ -7,15 +7,20 @@ import Image from "next/image";
 import Footer from "./layout/Footer";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (status === "loading") return; // Si está cargando, no hacer nada
+    if (!session) {
       router.push("/auth/login?expired=1");
     }
-  }, []);
+  }, [session, status, router]);
+
   const { theme } = useTheme();
   return (
     <div className="flex flex-col gap-y-4">

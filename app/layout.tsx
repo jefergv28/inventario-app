@@ -1,8 +1,10 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "next-themes";
+import SessionWrapper from "./SessionWrapper"; // 👈 Importa el wrapper
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +35,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`${geistSans.variable} ${geistMono.variable} bg-body bg-cover bg-no-repeat antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
-          {children}
-        </ThemeProvider>
+        <SessionWrapper>
+          {" "}
+          {/* ✅ Aquí sí lo usamos */}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+          >
+            {children}
+          </ThemeProvider>
+        </SessionWrapper>
       </body>
     </html>
   );

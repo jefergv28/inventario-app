@@ -5,7 +5,7 @@ import { useTheme } from "@/app/hooks/use-theme";
 import { Bell, ChevronLeft, Moon, Search, Sun, LogOut } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { signOut } from "next-auth/react"; // 🔥 Importamos signOut
+import { useNetAuth } from "@/app/hooks/useNetAuth"; // 👈 Importamos tu hook
 
 interface HeaderProps {
   collapsed: boolean;
@@ -14,11 +14,12 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
   const { theme, setTheme } = useTheme();
+  const { logout } = useNetAuth(); // 👈 Obtenemos logout y user
   const [isFocused, setIsFocused] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/auth/login" }); // 🔥 Cierra sesión y redirige a /auth/login
+  const handleLogout = () => {
+    logout(); // 👈 Usamos el logout de Netlify Identity
   };
 
   return (
@@ -31,7 +32,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
           <ChevronLeft className={collapsed ? "rotate-180" : ""} />
         </button>
 
-        {/* Input con animación */}
         <motion.div
           className="relative flex items-center overflow-hidden rounded-md border border-slate-300 bg-white px-2 transition-all dark:bg-slate-800"
           animate={{ width: isFocused ? 240 : 160, height: 35 }}
@@ -43,8 +43,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
           />
           <input
             type="text"
-            name="search"
-            id="search"
             placeholder="Buscar..."
             className="w-full bg-transparent text-slate-900 outline-0 placeholder:text-slate-400 dark:text-slate-300"
             onFocus={() => setIsFocused(true)}
@@ -71,7 +69,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
           <Bell size={20} />
         </button>
 
-        {/* Imagen de perfil con menú desplegable */}
         <div className="relative">
           <button
             className="size-10 overflow-hidden rounded-full"
@@ -86,7 +83,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             />
           </button>
 
-          {/* Menú desplegable */}
           {menuOpen && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
