@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../hooks/useApi";
+import Cookies from "js-cookie"; // Importa js-cookie
 
 interface Producto {
   id: number;
@@ -27,7 +28,9 @@ const useProductos = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // Obtener el token desde las cookies
+        const token = Cookies.get("next-auth.session-token"); // Usamos js-cookie para obtener el token
+
         if (!token) throw new Error("Usuario no autenticado");
 
         const response = await api.get<BackendProducto[]>("/productos", {
@@ -36,7 +39,7 @@ const useProductos = () => {
 
         console.log("Respuesta API:", response.data);
 
-        // Transformar datos del backend al formato esperado en el frontend
+        // Transformar los datos del backend al formato esperado en el frontend
         const transformedData: Producto[] = response.data.map((p) => ({
           id: p.id,
           nombreProducto: p.nombre_producto,

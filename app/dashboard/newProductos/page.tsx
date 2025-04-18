@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import useAgregarProducto from "@/app/hooks/useAgregarProducto";
-import BarcodeScanner from "@/components/BarcodeScanner";
 import { useRouter } from "next/navigation";
+import useAgregarProducto from "@/app/hooks/useAgregarProducto";
+import { Producto } from "@/app/services/agregarProducto";
 
 interface Categoria {
   id: number;
@@ -20,8 +20,8 @@ const NewProductPage = () => {
     description: "",
     category: "",
     provider: "",
-    barcode: "",
     price: 0,
+    image: null as File | null, // <-- imagen del producto
   });
 
   const [errors, setErrors] = useState({
@@ -29,19 +29,21 @@ const NewProductPage = () => {
     quantity: "",
     category: "",
     provider: "",
-    barcode: "",
     price: "",
+    image: "",
   });
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [scanActive, setScanActive] = useState(false);
 
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
         const response = await fetch("http://localhost:8000/categorias");
-        if (!response.ok) throw new Error("Error al obtener categorías");
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`Error al obtener categorías: ${errorData}`);
+        }
         const data = await response.json();
         setCategorias(data);
       } catch (error) {
@@ -58,8 +60,8 @@ const NewProductPage = () => {
       quantity: product.quantity < 0 ? "La cantidad no puede ser negativa." : "",
       category: !product.category ? "La categoría es obligatoria." : "",
       provider: !product.provider.trim() ? "El proveedor es obligatorio." : "",
-      barcode: !/^\d{8,13}$/.test(product.barcode) ? "El código de barras debe ser numérico (8-13 dígitos)." : "",
       price: product.price <= 0 ? "El precio debe ser un número positivo." : "",
+      image: !product.image ? "La imagen es obligatoria." : "",
     };
 
     setErrors(newErrors);
@@ -70,13 +72,17 @@ const NewProductPage = () => {
     const { name, value } = e.target;
     setProduct((prev) => ({
       ...prev,
-      [name]: name === "quantity" || name === "price" ? Number(value) || 0 : value,
+      [name]: name === "quantity" || name === "price" || name === "category" ? Number(value) || 0 : value,
     }));
   };
 
-  const handleScan = (barcode: string) => {
-    setProduct((prev) => ({ ...prev, barcode }));
-    setScanActive(false);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setProduct((prev) => ({
+        ...prev,
+        image: e.target.files![0],
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,25 +90,32 @@ const NewProductPage = () => {
     if (!validate()) return;
 
     try {
-      await agregarProducto({
-        ...product,
-        category: product.category, // Asegurar que category sea string
-      });
+      const producto: Producto = {
+        name: product.name,
+        quantity: product.quantity,
+        description: product.description,
+        category: product.category,
+        provider: product.provider,
+        price: product.price,
+        image: product.image,
+      };
+
+      // Llamada a la función agregarProducto pasándole el objeto Producto y el token
+      await agregarProducto(producto); // Asegúrate de pasar el token adecuado
 
       setSuccessMessage("¡Producto agregado correctamente!");
       setTimeout(() => {
         router.push("/dashboard/productos");
       }, 1500);
 
-      // Reset form
       setProduct({
         name: "",
         quantity: 0,
         description: "",
         category: "",
         provider: "",
-        barcode: "",
         price: 0,
+        image: null,
       });
     } catch (err) {
       console.error("Error al agregar producto:", err);
@@ -120,101 +133,80 @@ const NewProductPage = () => {
         onSubmit={handleSubmit}
         className="space-y-4"
       >
-        <div>
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre del producto"
-            value={product.name}
-            onChange={handleChange}
-            className={`input w-full ${errors.name ? "border-red-500" : ""}`}
-          />
-          {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
-        </div>
+        {/* Nombre */}
+        <input
+          type="text"
+          name="name"
+          placeholder="Nombre del producto"
+          value={product.name}
+          onChange={handleChange}
+          className={`input w-full ${errors.name ? "border-red-500" : ""}`}
+        />
+        {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
 
-        <div>
-          <input
-            type="number"
-            name="quantity"
-            placeholder="Cantidad"
-            value={product.quantity}
-            onChange={handleChange}
-            className={`input w-full ${errors.quantity ? "border-red-500" : ""}`}
-          />
-          {errors.quantity && <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>}
-        </div>
+        {/* Cantidad */}
+        <input
+          type="number"
+          name="quantity"
+          placeholder="Cantidad"
+          value={product.quantity}
+          onChange={handleChange}
+          className={`input w-full ${errors.quantity ? "border-red-500" : ""}`}
+        />
+        {errors.quantity && <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>}
 
-        <div>
-          <select
-            name="category"
-            value={product.category}
-            onChange={handleChange}
-            className={`input w-full ${errors.category ? "border-red-500" : ""}`}
-          >
-            <option value="">Selecciona una categoría</option>
-            {categorias.map((categoria) => (
-              <option
-                key={categoria.id}
-                value={categoria.id}
-              >
-                {categoria.nombre}
-              </option>
-            ))}
-          </select>
-          {errors.category && <p className="mt-1 text-sm text-red-500">{errors.category}</p>}
-        </div>
-
-        <div>
-          <input
-            type="text"
-            name="provider"
-            placeholder="Proveedor"
-            value={product.provider}
-            onChange={handleChange}
-            className={`input w-full ${errors.provider ? "border-red-500" : ""}`}
-          />
-          {errors.provider && <p className="mt-1 text-sm text-red-500">{errors.provider}</p>}
-        </div>
-
-        <div>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              name="barcode"
-              placeholder="Código de barras"
-              value={product.barcode}
-              onChange={handleChange}
-              className={`input flex-1 ${errors.barcode ? "border-red-500" : ""}`}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setScanActive(!scanActive)}
+        {/* Categoría */}
+        <select
+          name="category"
+          value={product.category}
+          onChange={handleChange}
+          className={`input w-full ${errors.category ? "border-red-500" : ""}`}
+        >
+          <option value="">Selecciona una categoría</option>
+          {categorias.map((categoria) => (
+            <option
+              key={categoria.id}
+              value={categoria.id}
             >
-              {scanActive ? "Cancelar" : "Escanear"}
-            </Button>
-          </div>
-          {errors.barcode && <p className="mt-1 text-sm text-red-500">{errors.barcode}</p>}
-          {scanActive && (
-            <div className="mt-2">
-              <BarcodeScanner onScan={handleScan} />
-            </div>
-          )}
-        </div>
+              {categoria.nombre}
+            </option>
+          ))}
+        </select>
+        {errors.category && <p className="mt-1 text-sm text-red-500">{errors.category}</p>}
 
-        <div>
-          <input
-            type="number"
-            name="price"
-            placeholder="Precio"
-            value={product.price}
-            onChange={handleChange}
-            step="0.01"
-            className={`input w-full ${errors.price ? "border-red-500" : ""}`}
-          />
-          {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price}</p>}
-        </div>
+        {/* Proveedor */}
+        <input
+          type="text"
+          name="provider"
+          placeholder="Proveedor"
+          value={product.provider}
+          onChange={handleChange}
+          className={`input w-full ${errors.provider ? "border-red-500" : ""}`}
+        />
+        {errors.provider && <p className="mt-1 text-sm text-red-500">{errors.provider}</p>}
 
+        {/* Precio */}
+        <input
+          type="number"
+          name="price"
+          placeholder="Precio"
+          value={product.price}
+          onChange={handleChange}
+          step="0.01"
+          className={`input w-full ${errors.price ? "border-red-500" : ""}`}
+        />
+        {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price}</p>}
+
+        {/* Imagen */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className={`input w-full ${errors.image ? "border-red-500" : ""}`}
+        />
+        {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
+
+        {/* Descripción */}
         <textarea
           name="description"
           placeholder="Descripción (opcional)"

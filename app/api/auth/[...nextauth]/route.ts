@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name ?? ""; // 👈 agrega esto
+        token.name = user.name ?? "";
         token.email = user.email;
         token.role = user.role;
         token.accessToken = user.accessToken ?? "";
@@ -74,6 +74,14 @@ export const authOptions: NextAuthOptions = {
           accessToken: token.accessToken,
         },
       };
+    },
+    // Aquí agregas el callback de redirección
+    async redirect({ url, baseUrl }) {
+      // Si la URL es la de login, redirige al dashboard
+      if (url === baseUrl || url === "/") {
+        return `${baseUrl}/dashboard`;  // Cambia "/dashboard" a la ruta de tu dashboard
+      }
+      return url;
     },
   },
 };

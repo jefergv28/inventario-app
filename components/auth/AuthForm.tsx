@@ -9,6 +9,7 @@ import Button from "../Button";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SocialAuth from "./SocialAuth";
 import { signIn } from "next-auth/react";
+import Cookie from "js-cookie"; // Importamos la librería
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -25,6 +26,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     password?: string;
   }>({});
   const [feedback, setFeedback] = useState<string>("");
+
   const router = useRouter();
 
   const validateFullName = (value: string): string => {
@@ -64,6 +66,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
+    // Realizar validación
     const newErrors = {
       fullName: type === "register" ? validateFullName(fullName) : "",
       email: validateEmail(email),
@@ -72,8 +75,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
     setErrors(newErrors);
 
+    // Verificar si hay errores antes de enviar
     if (Object.values(newErrors).some((error) => error)) {
-      console.log("Errores en el formulario:", newErrors);
+      setFeedback("Por favor corrige los errores antes de enviar el formulario.");
       return;
     }
 
@@ -82,48 +86,33 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         const res = await fetch("http://localhost:8000/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fullName: fullName,
-            email: email,
-            password: password,
-          }),
+          body: JSON.stringify({ fullName, email, password }),
         });
 
         const data = await res.json();
 
-        if (!res.ok) {
-          console.error("Respuesta del servidor:", data);
-          throw new Error(data.message || "Error al registrar");
-        }
+        if (!res.ok) throw new Error(data.message || "Error al registrar");
 
-        // ✅ Guardar token si lo devuelve (opcional)
-        if (data.token) {
-          localStorage.setItem("authToken", data.token);
-        }
+        // Guardar token en cookies
+        Cookie.set("token", data.token, { expires: 1, secure: true, sameSite: "Strict" });
 
         setFeedback("Registro exitoso. Redirigiendo al login...");
         setTimeout(() => router.push("/auth/login"), 1500);
       } else {
-        const res = await signIn("credentials", {
-          redirect: false,
-          email,
-          password,
-        });
+        const res = await signIn("credentials", { redirect: false, email, password });
 
-        if (res?.error) {
-          throw new Error(res.error);
+        if (res?.error) throw new Error(res.error);
+
+        if (res?.ok) {
+          setFeedback("Inicio de sesión exitoso. Redirigiendo...");
+          console.log("redirigiedo al dasboard")
+          router.push("/dashboard");
+        } else {
+          setFeedback("Error en el inicio de sesión.");
         }
-
-        setFeedback("Inicio de sesión exitoso. Redirigiendo...");
-        setTimeout(() => router.push("/dashboard"), 1000);
       }
     } catch (err) {
-      console.error("Error en auth:", err);
-      if (err instanceof Error) {
-        setFeedback(`Error: ${err.message}`);
-      } else {
-        setFeedback("Ocurrió un error inesperado.");
-      }
+      setFeedback(`Error: ${err instanceof Error ? err.message : "Ocurrió un error inesperado"}`);
     }
   };
 

@@ -1,79 +1,47 @@
 import { useState } from "react";
-import api from "../hooks/useApi";
-import { AxiosError } from "axios";
-
-interface Producto {
-  name: string;
-  quantity: number;
-  description: string;
-  category: string;
-  provider: string;
-  barcode: string;
-  image?: File | string | null; // <-- Ahora acepta File (imagen) o string (datos de scanner)
-}
+import agregarProducto from "../services/agregarProducto"; // Importa el servicio
+import { useSession } from "next-auth/react"; // Para obtener la sesión y el token de NextAuth
+import { Producto } from "../services/agregarProducto"; // Interfaz Producto
 
 const useAgregarProducto = () => {
+  const { data: session } = useSession();
+  console.log("Session:", session); // Verifica si la sesión tiene los datos correctos
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const agregarProducto = async (producto: Producto) => {
+  // Handler para agregar un producto
+  const agregarProductoHandler = async (producto: Producto) => {
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Usuario no autenticado");
-
-      const formData = new FormData();
-
-      // Agregar campos básicos
-      formData.append('name', producto.name);
-      formData.append('quantity', producto.quantity.toString());
-      formData.append('description', producto.description);
-      formData.append('category', producto.category);
-      formData.append('provider', producto.provider);
-      formData.append('barcode', producto.barcode);
-
-      // Manejar imagen/scanner
-      if (producto.image) {
-        if (producto.image instanceof File) {
-          // Es un archivo de imagen
-          formData.append('image', producto.image);
-        } else if (typeof producto.image === 'string') {
-          // Son datos de scanner (convertir a Blob)
-          const blob = new Blob([producto.image], { type: 'text/plain' });
-          formData.append('scan_data', blob);
-        }
+      // Verifica si el token está presente en la sesión
+      if (!session?.user?.accessToken) {
+        throw new Error("No se encontró el token de autenticación.");
       }
 
-      const response = await api.post("/productos", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // No establecer Content-Type, se genera automático con FormData
-        }
-      });
+      // Llamar al servicio para agregar el producto
+      const response = await agregarProducto(producto, session.user.accessToken);
 
-      return response.data;
-
-    } catch (err) {
-      let errorMessage = "Error al agregar producto";
-
-      if (err instanceof AxiosError) {
-        errorMessage = err.response?.data?.message ||
-                      err.message ||
-                      `Error ${err.response?.status}`;
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-
-      setError(errorMessage);
-      throw err;
+      setSuccess("Producto agregado correctamente!");
+      return response;
+    } catch (err: unknown) {
+      console.error("Error al agregar producto:", err);
+      setError("Hubo un error al agregar el producto.");
     } finally {
       setLoading(false);
     }
   };
 
-  return { agregarProducto, loading, error };
+  return {
+    agregarProducto: agregarProductoHandler,
+    loading,
+    error,
+    success,
+  };
 };
 
 export default useAgregarProducto;

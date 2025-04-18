@@ -1,7 +1,7 @@
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Session } from "next-auth";
 
-// Extiende el tipo de la sesión para incluir `accessToken` sin romper la interfaz original
+// Extiende el tipo de la sesión para incluir `accessToken`
 interface SessionWithToken extends Omit<Session, "user"> {
   user: {
     accessToken?: string;
@@ -16,20 +16,16 @@ interface SessionWithToken extends Omit<Session, "user"> {
 export const useNetAuth = () => {
   const { data: session, status } = useSession();
 
-  // Asegúrate de que la sesión se ha cargado
+  // Manejo de loading
   if (status === "loading") {
-    return { loading: true, accessToken: null };
+    return { loading: true, accessToken: null, logout: () => {} };
   }
 
-  // Verifica si el accessToken está disponible
   const accessToken = (session as SessionWithToken)?.user?.accessToken;
 
-  // Si no hay token de acceso, lo manejas como desees (p. ej., redirigir a login)
-  if (!accessToken) {
-    console.log("No access token");
-    return { accessToken: null };
-  }
+  const logout = () => {
+    signOut({ callbackUrl: "/auth/login" }); // <- Redirige al login luego de cerrar sesión
+  };
 
-  console.log("Token de acceso:", accessToken);
-  return { accessToken };
+  return { accessToken, logout };
 };

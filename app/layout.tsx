@@ -1,10 +1,8 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
 import { ThemeProvider } from "next-themes";
-import SessionWrapper from "./SessionWrapper"; // 👈 Importa el wrapper
+import SessionWrapper from "./SessionWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,17 +16,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Inventario-Pro",
-  description: "Software de gestión de inventarios eficiente y fácil de usar. Controla tus productos, proveedores y movimientos en un solo lugar.",
+  description: "Software de gestión de inventarios eficiente y fácil de usar.",
   icons: {
     icon: "/favicon.svg",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="es"
@@ -36,8 +30,6 @@ export default function RootLayout({
     >
       <body className={`${geistSans.variable} ${geistMono.variable} bg-body bg-cover bg-no-repeat antialiased`}>
         <SessionWrapper>
-          {" "}
-          {/* ✅ Aquí sí lo usamos */}
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
